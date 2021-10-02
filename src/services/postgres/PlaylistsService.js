@@ -54,11 +54,9 @@ class PlaylistsService {
   }
 
   async addSongToPlaylist(playlistId, songId) {
-    const id = `ps-${nanoid(16)}`;
-
     const query = {
-      text: 'INSERT INTO playlistsongs VALUES ($1, $2, $3) RETURNING id',
-      values: [id, playlistId, songId],
+      text: 'INSERT INTO playlistsongs (playlist_id, song_id) VALUES ($1, $2) RETURNING id',
+      values: [playlistId, songId],
     };
 
     const result = await this._pool.query(query);
@@ -93,7 +91,7 @@ class PlaylistsService {
 
     const result = await this._pool.query(query);
 
-    if (!result.rowCount) {
+    if (!result.rows.length) {
       throw new InvariantError('Lagu gagal dihapus');
     }
   }
@@ -130,6 +128,15 @@ class PlaylistsService {
         throw error;
       }
     }
+  }
+
+  async getUsersByUsername(username) {
+    const query = {
+      text: 'SELECT id, username, fullname FROM users WHERE username LIKE $1',
+      values: [`%${username}%`],
+    };
+    const result = await this._pool.query(query);
+    return result.rows;
   }
 }
 
