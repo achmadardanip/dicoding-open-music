@@ -1,3 +1,5 @@
+const { errorHandler } = require('../../utils');
+
 class SongsHandler {
   constructor(service, validator) {
     this._service = service;
@@ -14,7 +16,7 @@ class SongsHandler {
     try {
       this._validator.validateSongPayload(request.payload);
       const {
-        title, year, performer, genre, duration,
+        title = 'untitled', year, performer, genre, duration,
       } = request.payload;
 
       const songId = await this._service.addSong({
@@ -31,11 +33,11 @@ class SongsHandler {
       response.code(201);
       return response;
     } catch (error) {
-      return error;
+      return errorHandler(error, h);
     }
   }
 
-  async getSongsHandler() {
+  async getSongsHandler(request, h) {
     try {
       const songs = await this._service.getSongs();
       return {
@@ -45,11 +47,11 @@ class SongsHandler {
         },
       };
     } catch (error) {
-      return error;
+      return errorHandler(error, h);
     }
   }
 
-  async getSongByIdHandler(request) {
+  async getSongByIdHandler(request, h) {
     try {
       const { id } = request.params;
       const song = await this._service.getSongById(id);
@@ -60,11 +62,11 @@ class SongsHandler {
         },
       };
     } catch (error) {
-      return error;
+      return errorHandler(error, h);
     }
   }
 
-  async putSongByIdHandler(request) {
+  async putSongByIdHandler(request, h) {
     try {
       this._validator.validateSongPayload(request.payload);
       const { id } = request.params;
@@ -75,11 +77,11 @@ class SongsHandler {
         message: 'Lagu berhasil diperbarui',
       };
     } catch (error) {
-      return error;
+      return errorHandler(error, h);
     }
   }
 
-  async deleteSongByIdHandler(request) {
+  async deleteSongByIdHandler(request, h) {
     try {
       const { id } = request.params;
       await this._service.deleteSongById(id);
@@ -88,7 +90,7 @@ class SongsHandler {
         message: 'Lagu berhasil dihapus',
       };
     } catch (error) {
-      return error;
+      return errorHandler(error, h);
     }
   }
 }

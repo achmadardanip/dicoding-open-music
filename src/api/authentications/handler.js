@@ -1,3 +1,5 @@
+const { errorHandler } = require('../../utils');
+
 class AuthenticationsHandler {
   constructor(authenticationsService, usersService, tokenManager, validator) {
     this._authenticationsService = authenticationsService;
@@ -32,11 +34,11 @@ class AuthenticationsHandler {
       response.code(201);
       return response;
     } catch (error) {
-      return error;
+      return errorHandler(error, h);
     }
   }
 
-  async putAuthenticationHandler(request) {
+  async putAuthenticationHandler(request, h) {
     try {
       this._validator.validatePutAuthenticationPayload(request.payload);
       const { refreshToken } = request.payload;
@@ -46,17 +48,17 @@ class AuthenticationsHandler {
       const accessToken = this._tokenManager.generateAccessToken({ id });
       return {
         status: 'success',
-        message: 'Authentication berhasil diperbarui',
+        message: 'Access token berhasil diperbarui',
         data: {
           accessToken,
         },
       };
     } catch (error) {
-      return error;
+      return errorHandler(error, h);
     }
   }
 
-  async deleteAuthenticationHandler(request) {
+  async deleteAuthenticationHandler(request, h) {
     try {
       this._validator.validateDeleteAuthenticationPayload(request.payload);
 
@@ -70,7 +72,7 @@ class AuthenticationsHandler {
         message: 'Refresh token berhasil dihapus',
       };
     } catch (error) {
-      return error;
+      return errorHandler(error, h);
     }
   }
 }

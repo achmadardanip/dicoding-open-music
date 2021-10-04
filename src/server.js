@@ -6,7 +6,6 @@ const Jwt = require('@hapi/jwt');
 const songs = require('./api/music');
 const SongService = require('./services/postgres/SongService');
 const SongsValidator = require('./validator/music');
-const ClientError = require('./exceptions/ClientError');
 
 // users
 const users = require('./api/users');
@@ -110,32 +109,32 @@ const init = async () => {
     },
   ]);
 
-  server.ext('onPreResponse', (request, h) => {
-    // mendapatkan konteks response dari request
-    const { response } = request;
-    if (response instanceof ClientError) {
-      // membuat response baru dari response toolkit sesuai kebutuhan error handling
-      const newResponse = h.response({
-        status: 'fail',
-        message: response.message,
-      });
-      newResponse.code(response.statusCode);
-      return newResponse;
-    }
+  // server.ext('onPreResponse', (request, h) => {
+  //   // mendapatkan konteks response dari request
+  //   const { response } = request;
+  //   if (response instanceof ClientError) {
+  //     // membuat response baru dari response toolkit sesuai kebutuhan error handling
+  //     const newResponse = h.response({
+  //       status: 'fail',
+  //       message: response.message,
+  //     });
+  //     newResponse.code(response.statusCode);
+  //     return newResponse;
+  //   }
 
-    // server error!
-    if (response instanceof Error) {
-      const newResponse = h.response({
-        status: 'error',
-        message: response.output.payload.message,
-      });
-      newResponse.code(response.output.statusCode);
-      return newResponse;
-    }
+  //   // server error!
+  //   if (response instanceof Error) {
+  //     const newResponse = h.response({
+  //       status: 'error',
+  //       message: response.output.payload.message,
+  //     });
+  //     newResponse.code(response.output.statusCode);
+  //     return newResponse;
+  //   }
 
-    // jika bukan ClientError, lanjutkan dengan response sebelumnya (tanpa terintervensi)
-    return response.continue || response;
-  });
+  //   // jika bukan ClientError, lanjutkan dengan response sebelumnya (tanpa terintervensi)
+  //   return response.continue || response;
+  // });
 
   await server.start();
   console.log(`Server berjalan pada ${server.info.uri}`);

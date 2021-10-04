@@ -1,3 +1,5 @@
+const { errorHandler } = require('../../utils');
+
 class PlaylistHandler {
   constructor(service, validator) {
     this._service = service;
@@ -5,11 +7,10 @@ class PlaylistHandler {
 
     this.postPlaylistHandler = this.postPlaylistHandler.bind(this);
     this.getPlaylistHandler = this.getPlaylistHandler.bind(this);
-    this.deletePlaylistByIdHandler = this.deletePlaylistByIdHandler.bind(this);
+    this.deletePlaylistHandler = this.deletePlaylistHandler.bind(this);
     this.postSongToPlaylistHandler = this.postSongToPlaylistHandler.bind(this);
     this.getSongFromPlaylistHandler = this.getSongFromPlaylistHandler.bind(this);
     this.deleteSongFromPlaylistHandler = this.deleteSongFromPlaylistHandler.bind(this);
-    this.getUsersByUsernameHandler = this.getUsersByUsernameHandler.bind(this);
   }
 
   async postPlaylistHandler(request, h) {
@@ -33,11 +34,11 @@ class PlaylistHandler {
       response.code(201);
       return response;
     } catch (error) {
-      return error;
+      return errorHandler(error, h);
     }
   }
 
-  async getPlaylistHandler(request) {
+  async getPlaylistHandler(request, h) {
     try {
       const { id: credentialId } = request.auth.credentials;
       const playlists = await this._service.getPlaylists(credentialId);
@@ -48,11 +49,11 @@ class PlaylistHandler {
         },
       };
     } catch (error) {
-      return error;
+      return errorHandler(error, h);
     }
   }
 
-  async deletePlaylistByIdHandler(request) {
+  async deletePlaylistHandler(request, h) {
     try {
       const { playlistId } = request.params;
       const { id: credentialId } = request.auth.credentials;
@@ -65,7 +66,7 @@ class PlaylistHandler {
         message: 'Playlist berhasil dihapus',
       };
     } catch (error) {
-      return error;
+      return errorHandler(error, h);
     }
   }
 
@@ -85,11 +86,11 @@ class PlaylistHandler {
       response.code(201);
       return response;
     } catch (error) {
-      return error;
+      return errorHandler(error, h);
     }
   }
 
-  async getSongFromPlaylistHandler(request) {
+  async getSongFromPlaylistHandler(request, h) {
     try {
       const { playlistId } = request.params;
       const { id: credentialId } = request.auth.credentials;
@@ -105,11 +106,11 @@ class PlaylistHandler {
         },
       };
     } catch (error) {
-      return error;
+      return errorHandler(error, h);
     }
   }
 
-  async deleteSongFromPlaylistHandler(request) {
+  async deleteSongFromPlaylistHandler(request, h) {
     try {
       const { playlistId } = request.params;
       const { songId } = request.payload;
@@ -123,22 +124,7 @@ class PlaylistHandler {
         message: 'Lagu berhasil dihapus dari playlist',
       };
     } catch (error) {
-      return error;
-    }
-  }
-
-  async getUsersByUsernameHandler(request) {
-    try {
-      const { username = '' } = request.query;
-      const users = await this._service.getUsersByUsername(username);
-      return {
-        status: 'success',
-        data: {
-          users,
-        },
-      };
-    } catch (error) {
-      return error;
+      return errorHandler(error, h);
     }
   }
 }

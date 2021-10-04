@@ -1,3 +1,5 @@
+const { errorHandler } = require('../../utils');
+
 class CollaborationsHandler {
   constructor(collaborationsService, playlistsService, validator) {
     this._collaborationsService = collaborationsService;
@@ -31,11 +33,11 @@ class CollaborationsHandler {
       response.code(201);
       return response;
     } catch (error) {
-      return error;
+      return errorHandler(error, h);
     }
   }
 
-  async deleteCollaborationHandler(request) {
+  async deleteCollaborationHandler(request, h) {
     try {
       this._validator.validateCollaborationPayload(request.payload);
       const { id: credentialId } = request.auth.credentials;
@@ -52,7 +54,7 @@ class CollaborationsHandler {
         message: 'Kolaborasi berhasil dihapus',
       };
     } catch (error) {
-      return error;
+      return errorHandler(error, h);
     }
   }
 }

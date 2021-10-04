@@ -11,7 +11,7 @@ class UsersService {
   }
 
   async addUser({ username, password, fullname }) {
-    await this.verifyNewUsername(username);
+    await this.verifyUsername(username);
 
     const id = `user-${nanoid(16)}`;
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -29,7 +29,7 @@ class UsersService {
     return result.rows[0].id;
   }
 
-  async verifyNewUsername(username) {
+  async verifyUsername(username) {
     const query = {
       text: 'SELECT username FROM users where username = $1',
       values: [username],
@@ -37,7 +37,7 @@ class UsersService {
 
     const result = await this._pool.query(query);
 
-    if (result.rows.length > 0) {
+    if (result.rowCount) {
       throw new InvariantError('Gagal menambahkan user. Username sudah digunakan.');
     }
   }
@@ -78,6 +78,15 @@ class UsersService {
     }
 
     return id;
+  }
+
+  async getUsersByUsername(username) {
+    const query = {
+      text: 'SELECT id, username, fullname FROM users WHERE username LIKE $1',
+      values: [`%${username}%`],
+    };
+    const result = await this._pool.query(query);
+    return result.rows;
   }
 }
 
