@@ -54,13 +54,13 @@ class PlaylistsService {
   }
 
   async addSongToPlaylist(playlistId, songId) {
+    const id = `idplaylistsong-${nanoid(16)}`;
     const query = {
-      text: 'INSERT INTO playlistsongs (playlist_id, song_id) VALUES ($1, $2) RETURNING id',
-      values: [playlistId, songId],
+      text: 'INSERT INTO playlistsongs (id, playlist_id, song_id) VALUES ($1, $2, $3) RETURNING id',
+      values: [id, playlistId, songId],
     };
 
     const result = await this._pool.query(query);
-
     if (!result.rowCount) {
       throw new InvariantError('Lagu gagal ditambahkan ke playlist');
     }
@@ -97,17 +97,20 @@ class PlaylistsService {
   }
 
   async verifyPlaylistOwner(id, owner) {
+    console.log(id);
+    console.log(owner);
     const query = {
       text: 'SELECT * FROM playlists WHERE id = $1',
       values: [id],
     };
-
+    console.log('test 5');
     const result = await this._pool.query(query);
-
+    console.log(result);
     if (!result.rowCount) {
       throw new NotFoundError('Playlist tidak ditemukan');
     }
-
+    console.log(result.rows[0]);
+    console.log(owner);
     const playlist = result.rows[0];
 
     if (playlist.owner !== owner) {
@@ -117,6 +120,7 @@ class PlaylistsService {
 
   async verifyPlaylistAccess(playlistId, userId) {
     try {
+      console.log('test');
       await this.verifyPlaylistOwner(playlistId, userId);
     } catch (error) {
       if (error instanceof NotFoundError) {
